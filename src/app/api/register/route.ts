@@ -8,7 +8,13 @@ const prisma = new PrismaClient()
 export async function POST(req: Request) {
     try {
         // Tenta ler o corpo da requisição
-        let body = {};
+        interface UserData {
+            name?: string;
+            email?: string;
+            password?: string;
+        }
+
+        let body: UserData = {};
         const contentType = req.headers.get('content-type') || '';
 
         if (contentType.includes('application/json')) {
@@ -29,7 +35,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Tipo de conteúdo não suportado" }, { status: 400 });
         }
 
-        const { name, email, password } = body;
+        const { name, email, password } = body as { name: string; email: string; password: string };
 
         if (!name || !email || !password) {
             return NextResponse.json({ error: "Nome, email e senha são obrigatórios" }, { status: 400 })

@@ -1,67 +1,76 @@
-"use client";
+// src/app/login/page.tsx
+"use client"; //
 
-import { useState, useEffect } from "react"
-import { GalleryVerticalEnd } from "lucide-react"
-import Image from "next/image"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useSession, signIn } from "next-auth/react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import Link from "next/link"
-
+import { useState, useEffect } from "react";
+import { GalleryVerticalEnd } from "lucide-react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession, signIn } from "next-auth/react"; //
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+// Remova: import { SessionProvider } from "next-auth/react"; //
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [error, setError] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const callbackUrl = searchParams.get("callbackUrl") || "/user/home"
-    const { data: session, status } = useSession()
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/user/home";
+    const { data: session, status } = useSession(); //
 
     useEffect(() => {
         // Este useEffect já lida com o redirecionamento após a sessão ser carregada/atualizada
-        if (status === "loading") return;
-        if (session && session.user) {
+        if (status === "loading") return; //
+        if (session && session.user) { //
             console.log("LoginPage: Sessão detectada no useEffect. Redirecionando para", callbackUrl);
-            router.push(callbackUrl);
+            router.push(callbackUrl); //
         }
-    }, [session, status, router, callbackUrl])
+    }, [session, status, router, callbackUrl]); //
 
-    if (status === "loading") {
-        return <div>Carregando...</div>
+    if (status === "loading") { //
+        return <div>Carregando...</div>; //
+    }
+
+    // Se a sessão já existe, e não está carregando, não precisa renderizar o formulário
+    // O useEffect acima já teria disparado o redirecionamento.
+    // Este `if` é mais uma garantia visual caso o redirecionamento demore um micro-momento.
+    if (session && session.user) {
+        return <div>Você já está logado! Redirecionando...</div>;
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setError("")
+        e.preventDefault();
+        setIsLoading(true);
+        setError("");
 
         try {
             const result = await signIn("credentials", {
-                redirect: false,
+                redirect: false, //
                 email,
                 password,
-            })
+            });
 
-            if (result?.error) {
-                setError("Credenciais inválidas. Por favor, tente novamente.")
+            if (result?.error) { //
+                setError("Credenciais inválidas. Por favor, tente novamente."); //
             } else {
-                console.log("Sessão criada com sucesso após login", { email });
-                router.push(callbackUrl)
+                console.log("Login bem-sucedido. useSession agora deve atualizar e disparar o useEffect.");
+                // NADA A FAZER AQUI - o useEffect acima vai capturar a atualização da sessão
+                // e fazer o redirecionamento.
             }
         } catch {
-            setError("Ocorreu um erro. Por favor, tente novamente.")
+            setError("Ocorreu um erro. Por favor, tente novamente.");
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
 
     return (
-
+        // Remova o SessionProvider daqui, pois ele já está no layout.tsx via providers.tsx
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
                 <div className="flex justify-center gap-2 md:justify-start">
@@ -150,6 +159,5 @@ export default function LoginPage() {
                 />
             </div>
         </div>
-
-    )
+    );
 }
