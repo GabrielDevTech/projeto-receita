@@ -7,7 +7,29 @@ const prisma = new PrismaClient()
 
 export async function POST(req: Request) {
     try {
-        const { name, email, password } = await req.json()
+        // Tenta ler o corpo da requisição
+        let body = {};
+        const contentType = req.headers.get('content-type') || '';
+
+        if (contentType.includes('application/json')) {
+            try {
+                body = await req.json();
+            } catch {
+                return NextResponse.json({ error: "Corpo da requisição JSON inválido" }, { status: 400 });
+            }
+        } else if (contentType.includes('application/x-www-form-urlencoded')) {
+            const text = await req.text();
+            const params = new URLSearchParams(text);
+            body = {
+                name: params.get('name') || '',
+                email: params.get('email') || '',
+                password: params.get('password') || ''
+            };
+        } else {
+            return NextResponse.json({ error: "Tipo de conteúdo não suportado" }, { status: 400 });
+        }
+
+        const { name, email, password } = body;
 
         if (!name || !email || !password) {
             return NextResponse.json({ error: "Nome, email e senha são obrigatórios" }, { status: 400 })
