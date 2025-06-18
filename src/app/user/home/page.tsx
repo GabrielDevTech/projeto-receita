@@ -4,7 +4,7 @@
 import { useSession } from "next-auth/react"; //
 import { useRouter } from "next/navigation"; //
 import { useEffect } from "react"; //
-// Remova: import SessionWrapper from "@/components/SessionWrapper"; //
+
 
 export default function HomePage() {
     const { data: session, status } = useSession(); //
@@ -31,7 +31,7 @@ export default function HomePage() {
     }
 
     return (
-        // Remova o SessionWrapper daqui
+
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
             <h1 className="text-3xl font-bold mb-6">Bem-vindo, {session.user.name || session.user.email || "Usuário"}!</h1> {/* */}
             <p className="text-lg mb-8">Esta é a sua página inicial. Aqui você pode gerenciar suas receitas e perfil.</p> {/* */}
